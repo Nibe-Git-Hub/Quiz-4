@@ -97,8 +97,19 @@ def profile_create_view(request):
         return redirect('auth:signin')
 
     if request.method == 'POST':
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        bio = request.POST.get('bio')
+        profile_picture = request.FILES.get('profile_picture')
+
         try:
-            Profile.objects.create(user=request.user)
+            Profile.objects.create(
+                user=request.user,
+                first_name=first_name,
+                last_name=last_name,
+                bio=bio,
+                profile_picture=profile_picture
+            )
             messages.success(request, 'Profile created successfully!')
             return redirect('posts:post-list')
         except IntegrityError:
