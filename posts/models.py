@@ -1,18 +1,21 @@
 from django.db import models
-import random
+import random, os
 
 def get_filename_ext(filepath):
-    pass
+    base_name = os.path.basename(filepath)
+    name, ext = os.path.splitext(base_name)
+    return name, ext
 
 def upload_image_path(instance, filename):
-    new_filename = random.randint(1, 151251251)
+    new_filename = random.randint(1, 3910209312)
     name, ext = get_filename_ext(filename)
-    final_filename = '{new_filename}{ext}'.format(new_filename=new_filename, ext=ext)
-    
-    return f"post_images/{new_filename}/{final_filename}".format(new_filename=new_filename, final_filename=final_filename)
+    final_filename = f'{new_filename}{ext}'
+    return f'posts/{final_filename}'
+
 # Create your models here.
 class Post(models.Model):
     user = models.ForeignKey('accounts.CustomUser', on_delete=models.CASCADE)
+    title = models.CharField(max_length=200)
     content = models.TextField()
     image = models.ImageField(upload_to=upload_image_path, blank=True, null=True)
     slug = models.SlugField(max_length=200, unique=True)

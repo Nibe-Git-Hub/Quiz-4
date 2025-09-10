@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView, DetailView, DeleteView, UpdateView, CreateView
 from django.http import Http404
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -6,11 +6,13 @@ from django.core.exceptions import PermissionDenied
 from django.urls import reverse_lazy
 from .models import Post
 from .forms import PostForm
+from django.contrib import messages
 # Create your views here.
 class PostListView(ListView):
     model = Post
     template_name = 'posts/post_list.html'
-    
+
+
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return redirect('auth:signin')
@@ -21,6 +23,9 @@ class PostListView(ListView):
 class PostDetailSlugView(DetailView):
     queryset = Post.objects.all()
     template_name = 'posts/post_detail.html'
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(Post, slug=self.kwargs.get('slug'))
     
 class PostDeleteView(DeleteView):
     model = Post
@@ -34,7 +39,9 @@ class PostDeleteView(DeleteView):
         return obj
     
 class PostUpdateView(LoginRequiredMixin, UpdateView):
-
+    model = Post
+    form_class = PostForm
+    template_name = 'posts/post_update.html'
     
     def get_object(self, queryset=None):
         obj = super().get_object(queryset)
@@ -44,6 +51,10 @@ class PostUpdateView(LoginRequiredMixin, UpdateView):
     
     def get_success_url(self):
         return reverse_lazy('posts:post-detail', kwargs={'slug': self.object.slug})
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Your post has been updated successfully!')
+        return super().form_valid(form)
     
 class PostCreateView(CreateView):
     form_class = PostForm

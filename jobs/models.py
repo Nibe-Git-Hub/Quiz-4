@@ -1,5 +1,6 @@
 from django.db import models
 
+
 # Create your models here.
 class Job(models.Model):
     user = models.ForeignKey('accounts.CustomUser', on_delete=models.CASCADE)
