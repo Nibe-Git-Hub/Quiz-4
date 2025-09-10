@@ -1,3 +1,9 @@
+# Failed to Do
+- #5
+   - Can't figure out slug, creating a post destroys main post homepage. Getting error of no slug value even if I applied already.
+- #6
+   - Naubos po oras sa #5 T-T
+
 # Job Board Application
 
 A modern job board platform built with Django that combines social features with job posting capabilities. This project merges the functionality of a job portal with social interaction features.
