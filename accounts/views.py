@@ -84,12 +84,29 @@ def signin_view(request):
             if not Profile.objects.filter(user=user).exists():
                 print('User does not have a profile.')
             print('User has a profile.')
+            messages.info(request, 'Please complete your profile.')
+            return redirect('auth:profile_create')
         else:
             messages.error(request, 'Invalid email or password')
+            return redirect('posts:post-list')
     return render(request, 'auth/signin.html')
 
 def profile_create_view(request):
-    pass
+    if not request.user.is_authenticated:
+        messages.error(request, 'You must be signed in to create a profile.')
+        return redirect('auth:signin')
+
+    if request.method == 'POST':
+        try:
+            Profile.objects.create(user=request.user)
+            messages.success(request, 'Profile created successfully!')
+            return redirect('posts:post-list')
+        except IntegrityError:
+            messages.warning(request, 'You already have a profile.')
+            return redirect('posts:post-list')
+
+    return render(request, 'auth/profile_create.html')
+
 def profile_view(request):
     if not request.user.is_authenticated:
         messages.error(request, 'Please sign in first.')
