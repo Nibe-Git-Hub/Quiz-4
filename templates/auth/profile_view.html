@@ -6,41 +6,78 @@
 
 {% block content %}
 <div class="container py-4">
-    <!-- Profile Card -->
-    <div class="row justify-content-center mb-4">
-        <div class="col-lg-8">
+    <!-- Profile and Jobs Section -->
+    <div class="row justify-content-center">
+        <!-- Profile Card -->
+        <div class="col-lg-4 mb-4">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <div class="row">
-                        <!-- Profile Picture -->
-                        <div class="col-md-4 text-center mb-3 mb-md-0">
-                            {% if profile.profile_picture %}
-                                <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" 
-                                     class="rounded-circle img-fluid mb-3" style="width: 150px; height: 150px; object-fit: cover;">
-                            {% else %}
-                                <div class="rounded-circle bg-secondary bg-opacity-10 d-flex align-items-center justify-content-center mx-auto mb-3"
-                                     style="width: 150px; height: 150px;">
-                                    <i class="bi bi-person display-4 text-secondary"></i>
-                                </div>
-                            {% endif %}
-                        </div>
-                        <!-- Profile Info -->
-                        <div class="col-md-8">
-                            <h2 class="mb-2">{{ profile.first_name }} {{ profile.last_name }}</h2>
-                            <p class="text-muted mb-2">
-                                <i class="bi bi-envelope me-2"></i>{{ user.email }}
-                            </p>
-                            {% if profile.bio %}
-                                <h6 class="text-muted mb-2">About</h6>
-                                <p class="mb-3">{{ profile.bio }}</p>
-                            {% endif %}
-                        </div>
+                    <div class="text-center">
+                        {% if profile.profile_picture %}
+                            <img src="{{ profile.profile_picture.url }}" alt="Profile Picture"
+                                 class="rounded-circle img-fluid mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                        {% else %}
+                            <div class="rounded-circle bg-secondary bg-opacity-10 d-flex align-items-center justify-content-center mx-auto mb-3"
+                                 style="width: 150px; height: 150px;">
+                                <i class="bi bi-person display-4 text-secondary"></i>
+                            </div>
+                        {% endif %}
+                        <h2 class="mb-2">{{ profile.first_name }} {{ profile.last_name }}</h2>
+                        <p class="text-muted mb-2">
+                            <i class="bi bi-envelope me-2"></i>{{ user.email }}
+                        </p>
+                        {% if profile.bio %}
+                            <h6 class="text-muted mt-4">About</h6>
+                            <p class="mb-3">{{ profile.bio }}</p>
+                        {% endif %}
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Jobs Section -->
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header text-center bg-primary text-white">
+                    {% if user.is_admin and user.is_staff %}
+                    <h5 class="mb-0">Jobs Created</h5>
+                    {% else %}
+                    <h5 class="mb-0">Jobs Applied</h5>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if user.is_admin and user.is_staff %}
+                        {% if job_posted %}
+                            <div class="list-group">
+                                {% for job in job_posted %}
+                                <a href="{% url 'jobs:job-detail' job.slug %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                    {{ job.title }} - {{ job.company_name }}
+                                    <span class="badge bg-primary rounded-pill">{{ job.jobapplicant_set.all.count }} Applicants</span>
+                                </a>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-center text-muted">You have not created any jobs yet.</p>
+                        {% endif %}
+                    {% else %}
+                        {% if applied_jobs %}
+                            <div class="list-group">
+                                {% for applied_job in applied_jobs %}
+                                <a href="{% url 'jobs:job-detail' applied_job.job.slug %}" class="list-group-item list-group-item-action">
+                                    {{ applied_job.job.title }} at {{ applied_job.job.company_name }}
+                                </a>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-center text-muted">You have not applied for any jobs yet.</p>
+                        {% endif %}
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
 
 <style>
 .card {
@@ -54,4 +91,3 @@
     padding: 0.5em 1em;
 }
 </style>
-{% endblock %}
